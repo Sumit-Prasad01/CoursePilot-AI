@@ -2,129 +2,234 @@
   {
     "id": 1,
     "type": "prerequisite_check",
-    "query": "Can I take CS102 if I have completed CS101?"
+    "query": "Can I take CS102 if I have completed CS101?",
+    "expected": {
+      "decision": "eligible",
+      "must_include": ["CS101"],
+      "must_not_include": []
+    }
   },
   {
     "id": 2,
     "type": "prerequisite_check",
-    "query": "Can I take CS201 after completing CS102?"
+    "query": "Can I take CS201 after completing CS102?",
+    "expected": {
+      "decision": "eligible",
+      "must_include": ["CS102"],
+      "must_not_include": []
+    }
   },
   {
     "id": 3,
     "type": "prerequisite_check",
-    "query": "Can I enroll in CS301 if I have only completed CS101?"
+    "query": "Can I enroll in CS301 if I have only completed CS101?",
+    "expected": {
+      "decision": "not eligible",
+      "must_include": ["CS201"],
+      "must_not_include": []
+    }
   },
   {
     "id": 4,
     "type": "prerequisite_check",
-    "query": "Am I eligible for CS401 after completing CS301?"
+    "query": "Am I eligible for CS401 after completing CS301?",
+    "expected": {
+      "decision": "eligible",
+      "must_include": ["CS301"],
+      "must_not_include": []
+    }
   },
   {
     "id": 5,
     "type": "prerequisite_check",
-    "query": "Can I take CS220 if I have completed CS102 but not CS201?"
+    "query": "Can I take CS220 if I have completed CS102 but not CS201?",
+    "expected": {
+      "decision": "not eligible",
+      "must_include": ["CS201"],
+      "must_not_include": []
+    }
   },
   {
     "id": 6,
     "type": "prerequisite_check",
-    "query": "Can I enroll in CS210 with CS102 and MATH101?"
+    "query": "Can I enroll in CS210 with CS102 and MATH101?",
+    "expected": {
+      "decision": "eligible",
+      "must_include": ["CS102", "MATH101"],
+      "must_not_include": []
+    }
   },
   {
     "id": 7,
     "type": "prerequisite_check",
-    "query": "Can I take CS330 without STAT201?"
+    "query": "Can I take CS330 without STAT201?",
+    "expected": {
+      "decision": "not eligible",
+      "must_include": ["STAT201"],
+      "must_not_include": []
+    }
   },
   {
     "id": 8,
     "type": "prerequisite_check",
-    "query": "Am I eligible for CS340 if I have CS201 and MATH201?"
+    "query": "Am I eligible for CS340 if I have CS201 and MATH201?",
+    "expected": {
+      "decision": "eligible",
+      "must_include": ["CS201", "MATH201"],
+      "must_not_include": []
+    }
   },
   {
     "id": 9,
     "type": "prerequisite_check",
-    "query": "Can I take CS350 after completing CS201 only?"
+    "query": "Can I take CS350 after completing CS201 only?",
+    "expected": {
+      "decision": "not eligible",
+      "must_include": ["CS220"],
+      "must_not_include": []
+    }
   },
   {
     "id": 10,
     "type": "prerequisite_check",
-    "query": "Can I enroll in CS102 without completing CS101?"
+    "query": "Can I enroll in CS102 without completing CS101?",
+    "expected": {
+      "decision": "not eligible",
+      "must_include": ["CS101"],
+      "must_not_include": []
+    }
   },
 
   {
     "id": 11,
     "type": "multi_hop",
-    "query": "What do I need before taking CS401?"
+    "query": "What do I need before taking CS401?",
+    "expected": {
+      "must_include": ["CS301", "CS201", "CS102", "CS101"],
+      "must_not_include": []
+    }
   },
   {
     "id": 12,
     "type": "multi_hop",
-    "query": "List all prerequisites required to reach CS301 starting from scratch."
+    "query": "List all prerequisites required to reach CS301 starting from scratch.",
+    "expected": {
+      "must_include": ["CS201", "CS102", "CS101"],
+      "must_not_include": []
+    }
   },
   {
     "id": 13,
     "type": "multi_hop",
-    "query": "What courses must I complete before taking Machine Learning?"
+    "query": "What courses must I complete before taking Machine Learning?",
+    "expected": {
+      "must_include": ["CS201", "STAT201"],
+      "must_not_include": []
+    }
   },
   {
     "id": 14,
     "type": "multi_hop",
-    "query": "What is the full prerequisite chain for Computer Vision?"
+    "query": "What is the full prerequisite chain for Computer Vision?",
+    "expected": {
+      "must_include": ["CS201", "MATH201"],
+      "must_not_include": []
+    }
   },
   {
     "id": 15,
     "type": "multi_hop",
-    "query": "What path should I follow to reach Advanced AI?"
+    "query": "What path should I follow to reach Advanced AI?",
+    "expected": {
+      "must_include": ["CS301", "CS201", "CS102", "CS101"],
+      "must_not_include": []
+    }
   },
 
   {
     "id": 16,
     "type": "program_rules",
-    "query": "What is the maximum number of credits allowed per term?"
+    "query": "What is the maximum number of credits allowed per term?",
+    "expected": {
+      "must_include": ["18"],
+      "must_not_include": []
+    }
   },
   {
     "id": 17,
     "type": "program_rules",
-    "query": "How many total credits are required to graduate?"
+    "query": "How many total credits are required to graduate?",
+    "expected": {
+      "must_include": ["120"],
+      "must_not_include": []
+    }
   },
   {
     "id": 18,
     "type": "program_rules",
-    "query": "How many electives do I need to complete?"
+    "query": "How many electives do I need to complete?",
+    "expected": {
+      "must_include": ["4"],
+      "must_not_include": []
+    }
   },
   {
     "id": 19,
     "type": "program_rules",
-    "query": "Can CS210 or CS220 satisfy the systems requirement?"
+    "query": "Can CS210 or CS220 satisfy the systems requirement?",
+    "expected": {
+      "must_include": ["CS210", "CS220"],
+      "must_not_include": []
+    }
   },
   {
     "id": 20,
     "type": "program_rules",
-    "query": "What is the minimum grade required for prerequisites?"
+    "query": "What is the minimum grade required for prerequisites?",
+    "expected": {
+      "must_include": ["C"],
+      "must_not_include": []
+    }
   },
 
   {
     "id": 21,
     "type": "not_in_docs",
-    "query": "Is CS301 offered in the Fall semester?"
+    "query": "Is CS301 offered in the Fall semester?",
+    "expected": {
+      "decision": "abstain"
+    }
   },
   {
     "id": 22,
     "type": "not_in_docs",
-    "query": "Who teaches CS401?"
+    "query": "Who teaches CS401?",
+    "expected": {
+      "decision": "abstain"
+    }
   },
   {
     "id": 23,
     "type": "not_in_docs",
-    "query": "What is the class timing for CS210?"
+    "query": "What is the class timing for CS210?",
+    "expected": {
+      "decision": "abstain"
+    }
   },
   {
     "id": 24,
     "type": "not_in_docs",
-    "query": "Is CS330 available online?"
+    "query": "Is CS330 available online?",
+    "expected": {
+      "decision": "abstain"
+    }
   },
   {
     "id": 25,
     "type": "not_in_docs",
-    "query": "Which professor is best for Machine Learning?"
+    "query": "Which professor is best for Machine Learning?",
+    "expected": {
+      "decision": "abstain"
+    }
   }
 ]

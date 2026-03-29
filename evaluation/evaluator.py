@@ -14,62 +14,101 @@ def load_test_queries(path: str) -> List[Dict]:
         return json.load(f)
 
 
+def normalize(text: str) -> str:
+    return (text or "").lower()
+
+
+def check_keywords(text: str, keywords: List[str]) -> bool:
+    text = normalize(text)
+    return all(k.lower() in text for k in keywords)
+
+
+def check_not_keywords(text: str, keywords: List[str]) -> bool:
+    text = normalize(text)
+    return all(k.lower() not in text for k in keywords)
+
+
+def check_decision(text: str, expected: str) -> bool:
+    text = normalize(text)
+
+    if expected == "eligible":
+        return "eligible" in text
+
+    if expected == "not eligible":
+        return "not eligible" in text or "not eligible" in text
+
+    if expected == "abstain":
+        return "i don’t have" in text or "i don't have" in text
+
+    return False
+
+
 def evaluate():
     try:
-        logger.info("Starting evaluation...")
+        logger.info("Starting evaluation with ground truth...")
 
         workflow = CoursePlannerWorkflow()
         test_cases = load_test_queries("evaluation/test_queries.json")
 
         total = len(test_cases)
-        citation_count = 0
-        abstention_count = 0
+        correct = 0
 
         results = []
 
         for test in test_cases:
             query = test["query"]
-            q_type = test["type"]
+            expected = test.get("expected", {})
 
             logger.info(f"Evaluating: {query}")
 
-            output = workflow.run(query)
-            final_output = output.get("final_output", "")
+            result = workflow.run(query)
+            output = result.get("final_output", {})
 
-            # Check citation presence
-            has_citation = "[Chunk" in (final_output or "")
-            if has_citation:
-                citation_count += 1
+            answer_text = ""
+            if isinstance(output, dict):
+                answer_text = output.get("answer", "")
+            else:
+                answer_text = str(output)
 
-            # Check abstention
-            is_abstained = "I don’t have" in (final_output or "")
-            if q_type == "not_in_docs" and is_abstained:
-                abstention_count += 1
+            # ---- checks ----
+            decision_ok = True
+            include_ok = True
+            exclude_ok = True
+
+            if "decision" in expected:
+                decision_ok = check_decision(answer_text, expected["decision"])
+
+            if "must_include" in expected:
+                include_ok = check_keywords(answer_text, expected["must_include"])
+
+            if "must_not_include" in expected:
+                exclude_ok = check_not_keywords(answer_text, expected["must_not_include"])
+
+            is_correct = decision_ok and include_ok and exclude_ok
+
+            if is_correct:
+                correct += 1
 
             results.append({
                 "query": query,
-                "type": q_type,
-                "has_citation": has_citation,
-                "abstained_correctly": is_abstained if q_type == "not_in_docs" else None,
-                "output": final_output
+                "expected": expected,
+                "correct": is_correct,
+                "output": answer_text
             })
 
-        # Metrics
-        citation_coverage = (citation_count / total) * 100
-        abstention_accuracy = (abstention_count / 5) * 100  # 5 trick questions
+        accuracy = (correct / total) * 100
 
-        logger.info("\n" + "=" * 50)
-        logger.info("EVALUATION RESULTS")
-        logger.info("=" * 50)
-        logger.info(f"Total Queries: {total}")
-        logger.info(f"Citation Coverage: {citation_coverage:.2f}%")
-        logger.info(f"Abstention Accuracy: {abstention_accuracy:.2f}%")
+        logger.info("\n" + "=" * 60)
+        logger.info("🎯 FINAL EVALUATION (GROUND TRUTH)")
+        logger.info("=" * 60)
+        logger.info(f"Total: {total}")
+        logger.info(f"Correct: {correct}")
+        logger.info(f"Accuracy: {accuracy:.2f}%")
 
-        # Save results
-        with open("evaluation/results.json", "w", encoding="utf-8") as f:
+        with open("evaluation/final_results.json", "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2)
 
-        logger.info("Evaluation completed")
+        logger.info("Ground truth evaluation completed")
 
     except Exception as e:
         logger.error(f"Evaluation failed: {e}")

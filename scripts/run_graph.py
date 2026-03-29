@@ -24,7 +24,7 @@ def main():
 
         logger.info("\n" + "=" * 50)
         logger.info("FINAL OUTPUT:\n")
-        logger.info(result.get("final_output", "No output"))
+        logger.info(result["final_output"]["answer"])
         logger.info("\n" + "=" * 50)
 
         if result.get("error"):

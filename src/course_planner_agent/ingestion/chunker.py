@@ -1,6 +1,6 @@
 from typing import List
 from langchain_core.documents import Document
-from langchain_text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.course_planner_agent.utils.logger import logger
 
 

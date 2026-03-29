@@ -1,3 +1,4 @@
+import json
 from groq import Groq
 import os
 
@@ -13,23 +14,30 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 def format_docs(docs) -> str:
-    """
-    Convert retrieved docs into context string
-    """
     formatted = []
     for doc in docs:
         content = doc.page_content
-        meta = doc.metadata
-        chunk_id = meta.get("chunk_id", "N/A")
+        chunk_id = doc.metadata.get("chunk_id", "N/A")
         formatted.append(f"[Chunk {chunk_id}]\n{content}")
-
     return "\n\n".join(formatted)
 
 
+def safe_json_load(text: str):
+    """
+    Safely parse JSON from LLM output
+    """
+    try:
+        return json.loads(text)
+    except:
+        # try to extract JSON substring
+        import re
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if match:
+            return json.loads(match.group())
+        raise ValueError("Invalid JSON output from model")
+
+
 def planner_node(state: GraphState) -> GraphState:
-    """
-    Generates answer / plan using Groq LLaMA 70B
-    """
     try:
         logger.info("Running Planner Node")
 
@@ -38,17 +46,14 @@ def planner_node(state: GraphState) -> GraphState:
 
         context = format_docs(docs)
 
-        # Load prompts
         system_prompt = load_prompt(SYSTEM_PROMPT_PATH)
         planner_template = load_prompt(PLANNER_PROMPT_PATH)
 
-        #  Inject variables
         prompt = planner_template.format(
             context=context,
             query=query
         )
 
-        # Proper LLM call with system + user roles
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -58,11 +63,14 @@ def planner_node(state: GraphState) -> GraphState:
             temperature=0
         )
 
-        answer = response.choices[0].message.content
+        raw_output = response.choices[0].message.content
 
-        state["answer"] = answer
+        parsed = safe_json_load(raw_output)
 
-        logger.info("Planner Node completed")
+        # store structured output directly
+        state["answer"] = parsed
+
+        logger.info("Planner Node completed (JSON mode)")
 
         return state
 
