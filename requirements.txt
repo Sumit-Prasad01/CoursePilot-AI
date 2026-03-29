@@ -2,6 +2,7 @@ langchain
 langgraph
 langchain-community
 langchain-groq
+langchain-core
 
 sentence-transformers
 faiss-cpu
